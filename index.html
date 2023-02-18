@@ -1,1 +1,39 @@
-Hello World
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        img {
+            width: 360px;
+        }
+    </style>
+    <script>
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", "https://hkustconnect-my.sharepoint.com/:f:/g/personal/yhsha_connect_ust_hk/EsPDX1a_vmlIi6wA0X2zJZEBnbSH4mpOLi89FPCDvLCqJg?e=7j6TWy");
+        xhr.send();
+        xhr.responseType = "json";
+        xhr.onload = () => {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                const data = xhr.response;
+                console.log(data);
+            } else {
+                console.log(`Error: ${xhr.status}`);
+            }
+        };
+    </script>
+</head>
+
+<body>
+
+
+    <h1> Title </h1>
+    <table>
+        <tr>
+            <td><img src="/plots/intp_sea/2019/NO2/n_stats_7/NO2_2001_07_tpu_mean.png" alt="a"></td>
+            <td><img src="/plots/intp_sea/2019/NO2/n_stats_7/NO2_2002_07_tpu_mean.png" alt="a"></td>
+        </tr>
+    </table>
+    Hello World
+    <img src="https://hkustconnect-my.sharepoint.com/personal/yhsha_connect_ust_hk/Documents/plots/intp_sea/2019/NO2/n_stats_7/NO2_2001_07_tpu_mean.png"
+        alt="ss">
+</body>
