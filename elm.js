@@ -5209,13 +5209,14 @@ var $author$project$Show$init = A7(
 	'NO2',
 	_List_fromArray(
 		[
-			A5($author$project$Show$BCType, 'bc1', 'intp_sea', '2019', '10', ''),
-			A5($author$project$Show$BCType, 'bc2', 'intp_sea', '2019', '3', '')
+			A5($author$project$Show$BCType, 'bc1', 'sf', '2019', '7', ''),
+			A5($author$project$Show$BCType, 'bc2', 'intp_simple', '2019', '7', ''),
+			A5($author$project$Show$BCType, 'bc3', 'intp_sea', '2019', '7', '')
 		]),
 	'sf',
 	'2019',
 	'1',
-	2,
+	3,
 	false);
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
