@@ -252,13 +252,14 @@ init : Model
 init =
     Model
         "NO2"
-        [ BCType "bc1" "intp_sea" "2019" "10" ""
-        , BCType "bc2" "intp_sea" "2019" "3" ""
+        [ BCType "bc1" "sf" "2019" "7" ""
+        , BCType "bc2" "intp_simple" "2019" "7" ""
+        , BCType "bc3" "intp_sea" "2019" "7" ""
         ]
         "sf"
         "2019"
         "1"
-        2
+        3
         False
 
 
