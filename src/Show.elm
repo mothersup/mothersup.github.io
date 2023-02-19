@@ -2,7 +2,6 @@ module Show exposing (main)
 
 import Array exposing (..)
 import Bootstrap.Button as Button
-import Bootstrap.Dropdown as Dropdown
 import Bootstrap.Form as Form
 import Bootstrap.Form.Select as Select
 import Bootstrap.Table as Table
@@ -32,8 +31,6 @@ type alias Model =
     , newNStats : String
     , nRecords : Int
     , switched : Bool
-
-    -- , modalVisibility : Modal.Visibility
     }
 
 
@@ -263,10 +260,6 @@ init =
         False
 
 
-
--- Modal.hidden
-
-
 params : List String
 params =
     [ "NO2"
@@ -360,8 +353,6 @@ view model =
             ]
         , br [] []
         , div
-            -- [ class "w-25 row justify-content-center"
-            -- ]
             [ class "col-auto table-responsive container"
             ]
             [ showBCTypesTable model.bcTypes ]
