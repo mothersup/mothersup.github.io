@@ -1,12 +1,70 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <title>My First HTML</title>
-    <meta charset="UTF-8">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <style>
+        h1 {
+            text-align: center;
+        }
+
         img {
             width: 360px;
+        }
+
+        .img-center {
+            margin: auto;
+            display: block;
+        }
+
+        .center {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        th {
+            word-wrap: break-word;
+            white-space: pre;
+            text-align: center;
+        }
+
+        .table-fixed {
+            width: 50%;
+            margin: 0 auto;
+
+            tbody {
+                height: 200px;
+                overflow-y: auto;
+                width: 100%;
+            }
+
+            thead,
+            tbody,
+            tr,
+            td,
+            th {
+                display: block;
+            }
+
+            tbody {
+                td {
+                    float: left;
+                }
+            }
+
+            thead {
+                tr {
+                    th {
+                        float: left;
+                    }
+                }
+            }
         }
     </style>
     <script src="jquery-3.6.3.min.js"></script>
@@ -20,29 +78,25 @@
 </head>
 
 <body>
+    <h1>TPU Mean spatial plots</h1>
 
-    <h1>My First Heading</h1>
-
-    <p>My first paragraph.</p>
-
-    <div id="elm-code-is-loaded-here"></div>
+    <div id="elm-code"></div>
     <script src="elm.js"></script>
     <script>
         var app = Elm.Show.init({
-            node: document.getElementById("elm-code-is-loaded-here")
+            node: document.getElementById("elm-code")
         });
     </script>
-
-    <ul>
-        <li>
-            <img
-                src="https://hkustconnect-my.sharepoint.com/personal/yhsha_connect_ust_hk/Documents/plots/intp_sea/2019/NO2/n_stats_10/NO2_2001_10_tpu_mean.png">
-        </li>
-        <li>
-            <img
-                src="https://hkustconnect-my.sharepoint.com/personal/yhsha_connect_ust_hk/Documents/plots/intp_sea/2019/NO2/n_stats_10/NO2_2001_10_tpu_mean.png">
-        </li>
-    </ul>
+    <!-- <ul> -->
+    <!--     <li> -->
+    <!--         <img -->
+    <!--             src="https://hkustconnect-my.sharepoint.com/personal/yhsha_connect_ust_hk/Documents/plots/intp_sea/2019/NO2/n_stats_10/NO2_2001_10_tpu_mean.png"> -->
+    <!--     </li> -->
+    <!--     <li> -->
+    <!--         <img -->
+    <!--             src="https://hkustconnect-my.sharepoint.com/personal/yhsha_connect_ust_hk/Documents/plots/intp_sea/2019/NO2/n_stats_10/NO2_2001_10_tpu_mean.png"> -->
+    <!--     </li> -->
+    <!-- </ul> -->
 </body>
 
 </html>
