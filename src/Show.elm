@@ -14,33 +14,22 @@ import List.Extra exposing (..)
 import String exposing (..)
 
 
-type alias BCType =
-    { id : String
-    , name : String
-    , base : String
-    , n_stats : String
-    , subtype : String
-    }
+
+-- constants
 
 
-type alias Model =
-    { param : String
-    , bcTypes : List BCType
-    , newName : String
-    , newBase : String
-    , newNStats : String
-    , nRecords : Int
-    , switched : Bool
-    }
+params : List String
+params =
+    [ "NO2"
+    , "O3"
+    , "O3_max_8hr_avg"
+    , "SO2"
+    ]
 
 
-type Msg
-    = EditParam String
-    | AddSelectNameMsg String
-    | AddSelectBaseMsg String
-    | AddSelectNStatsMsg String
-    | AddButtonMsg
-    | DeleteButtonMsg String
+res : List String
+res =
+    [ "raw", "TPU", "DCD" ]
 
 
 fileBase : String
@@ -61,14 +50,99 @@ baseYears =
 
 modelNames : List String
 modelNames =
-    [ "sf", "intp_simple", "intp_sea" ]
+    [ "sf", "intp_simple", "intp_sea", "r_nrmse" ]
 
 
-formatFileName : String -> Int -> BCType -> String
-formatFileName param year bctype =
+subModelNames : List String
+subModelNames =
+    [ "r_70_nrmse_20"
+    , "r_70_nrmse_30"
+    , "r_70_nrmse_40"
+    , "r_70_nrmse_50"
+    , "r_80_nrmse_20"
+    , "r_80_nrmse_30"
+    , "r_80_nrmse_40"
+    , "r_80_nrmse_50"
+    , "r_90_nrmse_20"
+    , "r_90_nrmse_30"
+    , "r_90_nrmse_40"
+    , "r_90_nrmse_50"
+    ]
+
+
+type alias BCType =
+    { id : String
+    , name : String
+    , subname : String
+    , base : String
+    , n_stats : String
+    }
+
+
+type alias Model =
+    { param : String
+    , res : String
+    , bcTypes : List BCType
+    , newName : String
+    , newSubname : String
+    , newBase : String
+    , newNStats : String
+    , nRecords : Int
+    , switched : Bool
+    }
+
+
+type Msg
+    = EditParam String
+    | EditRes String
+    | AddSelectNameMsg String
+    | AddSelectSubnameMsg String
+    | AddSelectBaseMsg String
+    | AddSelectNStatsMsg String
+    | AddButtonMsg
+    | DeleteButtonMsg String
+
+
+formatFileName : String -> String -> Int -> BCType -> String
+formatFileName resolution param year bctype =
     let
+        modelSubnameStr =
+            if bctype.name == "r_nrmse" then
+                bctype.subname ++ "/"
+
+            else
+                ""
+
         nStatsStr =
-            "n_stats_" ++ bctype.n_stats
+            modelSubnameStr ++ "n_stats_" ++ bctype.n_stats
+
+        resStr =
+            case resolution of
+                "raw" ->
+                    "spatial"
+
+                "TPU" ->
+                    "tpu_mean"
+
+                "DCD" ->
+                    "dcd_mean"
+
+                _ ->
+                    "spatial"
+
+        resSuffix =
+            case resolution of
+                "raw" ->
+                    ""
+
+                "TPU" ->
+                    "tpu_mean"
+
+                "DCD" ->
+                    "dcd_mean"
+
+                _ ->
+                    ""
 
         fileNameRoot =
             param
@@ -76,10 +150,12 @@ formatFileName param year bctype =
                 ++ String.fromInt year
                 ++ "_"
                 ++ pad 2 '0' bctype.n_stats
-                ++ "_tpu_mean.png"
+                ++ resSuffix
+                ++ ".png"
     in
     String.join "/"
         [ fileBase
+        , resStr
         , bctype.name
         , bctype.base
         , param
@@ -88,33 +164,37 @@ formatFileName param year bctype =
         ]
 
 
-toLi : String -> Html msg
-toLi str =
-    li []
-        [ img [ src str ] []
-        ]
-
-
-toTd : String -> Int -> BCType -> Html msg
-toTd param year bctype =
+toTd : String -> String -> Int -> BCType -> Html msg
+toTd resolution param year bctype =
     let
         str =
-            formatFileName param year bctype
+            formatFileName resolution param year bctype
     in
     td [] [ img [ src str ] [] ]
 
 
-toTr : String -> Int -> List BCType -> Html msg
-toTr param year bctypeList =
+toTr : String -> String -> Int -> List BCType -> Html msg
+toTr resolution param year bctypeList =
     tr []
         (td [] [ String.fromInt year |> text ]
-            :: List.map (\bctype -> toTd param year bctype) bctypeList
+            :: List.map
+                (\bctype -> toTd resolution param year bctype)
+                bctypeList
         )
 
 
 formatBCName : BCType -> String
 formatBCName bctype =
+    let
+        subnameStr =
+            if String.isEmpty bctype.subname then
+                ""
+
+            else
+                "\n" ++ bctype.subname
+    in
     bctype.name
+        ++ subnameStr
         ++ "\nN stations: "
         ++ bctype.n_stats
         ++ "\nBase year: "
@@ -134,11 +214,13 @@ toThead bctypeList =
         )
 
 
-toHtmlTable : String -> List Int -> List BCType -> Html Msg
-toHtmlTable param yearList bctypeList =
+toHtmlTable : String -> String -> List Int -> List BCType -> Html Msg
+toHtmlTable resolution param yearList bctypeList =
     table [ class "center" ]
         (toThead bctypeList
-            :: List.map (\year -> toTr param year bctypeList) yearList
+            :: List.map 
+            (\year -> toTr resolution param year bctypeList) 
+            yearList
         )
 
 
@@ -146,6 +228,7 @@ toBCTypesTr : BCType -> Table.Row Msg
 toBCTypesTr bctype =
     Table.tr [ Table.rowAttr (id bctype.id) ]
         [ Table.td [] [ text bctype.name ]
+        , Table.td [] [ text bctype.subname ]
         , Table.td [] [ text bctype.base ]
         , Table.td [] [ text bctype.n_stats ]
         , Table.td []
@@ -161,18 +244,19 @@ toBCTypesTr bctype =
 showBCTypesTable : List BCType -> Html Msg
 showBCTypesTable bctypeList =
     Table.table
-        { options = [ Table.small, Table.hover, Table.attr (class "table-fixed")]
+        { options = [ Table.small, Table.hover, Table.attr (class "table-fixed") ]
         , thead =
             Table.simpleThead
                 [ Table.th [] [ text "Name" ]
+                , Table.th [] [ text "Subname" ]
                 , Table.th [] [ text "N stations" ]
                 , Table.th [] [ text "Base year" ]
                 , Table.th [] [ text "Delete row" ]
                 ]
         , tbody =
-            Table.tbody 
-            [] 
-            (List.map toBCTypesTr bctypeList)
+            Table.tbody
+                []
+                (List.map toBCTypesTr bctypeList)
         }
 
 
@@ -182,6 +266,9 @@ update msg model =
         EditParam param ->
             ( { model | param = param }, Cmd.none )
 
+        EditRes resolution ->
+            ( { model | res = resolution }, Cmd.none )
+
         AddSelectNameMsg name ->
             let
                 nStats =
@@ -190,14 +277,25 @@ update msg model =
 
                     else
                         "1"
+
+                subname =
+                    if name == "r_nrmse" then
+                        "r_70_nrmse_20"
+
+                    else
+                        ""
             in
             Debug.log name
                 ( { model
                     | newName = name
                     , newNStats = nStats
+                    , newSubname = subname
                   }
                 , Cmd.none
                 )
+
+        AddSelectSubnameMsg subname ->
+            ( { model | newSubname = subname }, Cmd.none )
 
         AddSelectBaseMsg base ->
             ( { model | newBase = base }, Cmd.none )
@@ -217,9 +315,9 @@ update msg model =
                     BCType
                         newId
                         model.newName
+                        model.newSubname
                         model.newBase
                         model.newNStats
-                        ""
 
                 newModel =
                     { model
@@ -249,24 +347,17 @@ init : Model
 init =
     Model
         "NO2"
-        [ BCType "bc1" "sf" "2019" "7" ""
-        , BCType "bc2" "intp_simple" "2019" "7" ""
-        , BCType "bc3" "intp_sea" "2019" "7" ""
+        "raw"
+        [ BCType "bc1" "sf" "" "2019" "7"
+        , BCType "bc2" "intp_simple" "" "2019" "7"
+        , BCType "bc3" "intp_sea" "" "2019" "7"
         ]
         "sf"
+        ""
         "2019"
         "1"
         3
         False
-
-
-params : List String
-params =
-    [ "NO2"
-    , "O3"
-    , "O3_max_8hr_avg"
-    , "SO2"
-    ]
 
 
 listOptions : String -> Select.Item Msg
@@ -292,23 +383,40 @@ paramSelect model =
         (List.map listOptions params)
 
 
+resSelect : Model -> Html Msg
+resSelect model =
+    Select.select
+        [ Select.id "resSelect"
+        , Select.onChange EditRes
+        ]
+        (List.map listOptions res)
+
+
 inputForm : Model -> Html Msg
 inputForm model =
     let
         nStatsRange =
-            if model.newName == "sf" then
+            if left 4 model.newName == "intp" then
                 List.map
                     (String.fromInt
                         >> (\opt -> listOptionsSelected opt model.newNStats)
                     )
-                    (range 1 14)
+                    (range 3 11)
 
             else
                 List.map
                     (String.fromInt
                         >> (\opt -> listOptionsSelected opt model.newNStats)
                     )
-                    (range 3 11)
+                    (range 1 14)
+
+        -- show subnames only when
+        modelSubnameList =
+            if model.newName == "r_nrmse" then
+                subModelNames
+
+            else
+                [ "-------------" ]
     in
     Form.formInline [ class "justify-content-center" ]
         [ Form.group []
@@ -319,6 +427,15 @@ inputForm model =
                 , Select.onChange AddSelectNameMsg
                 ]
                 (List.map listOptions modelNames)
+            ]
+        , Form.group []
+            [ Form.label [ for "subnameInput" ] [ text "Subname: " ]
+            , Select.select
+                [ Select.id "subnameInput"
+                , Select.attrs [ class "ml-2 mr-3 my-2" ]
+                , Select.onChange AddSelectSubnameMsg
+                ]
+                (List.map listOptions modelSubnameList)
             ]
         , Form.group []
             [ Form.label [ for "baseInput" ] [ text "Base year: " ]
@@ -351,6 +468,10 @@ view model =
             [ text "Parameter: "
             , paramSelect model
             ]
+        , div [ class "container w-25" ]
+            [ text "Resolution: "
+            , paramSelect model
+            ]
         , br [] []
         , div
             [ class "col-auto table-responsive container"
@@ -359,11 +480,11 @@ view model =
         , div []
             [ inputForm model ]
         , br [] []
-        , div [] 
-            [ img [ src ( fileBase ++ "/conc_cb.png" ), class "img-center"] []]
+        , div []
+            [ img [ src (fileBase ++ "/conc_cb.png"), class "img-center" ] [] ]
         , br [] []
         , div [ class "center" ]
-            [ toHtmlTable model.param years model.bcTypes ]
+            [ toHtmlTable model.res model.param years model.bcTypes ]
         ]
 
 

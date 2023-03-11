@@ -5197,23 +5197,25 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Show$BCType = F5(
-	function (id, name, base, n_stats, subtype) {
-		return {base: base, id: id, n_stats: n_stats, name: name, subtype: subtype};
+	function (id, name, subname, base, n_stats) {
+		return {base: base, id: id, n_stats: n_stats, name: name, subname: subname};
 	});
-var $author$project$Show$Model = F7(
-	function (param, bcTypes, newName, newBase, newNStats, nRecords, switched) {
-		return {bcTypes: bcTypes, nRecords: nRecords, newBase: newBase, newNStats: newNStats, newName: newName, param: param, switched: switched};
+var $author$project$Show$Model = F9(
+	function (param, res, bcTypes, newName, newSubname, newBase, newNStats, nRecords, switched) {
+		return {bcTypes: bcTypes, nRecords: nRecords, newBase: newBase, newNStats: newNStats, newName: newName, newSubname: newSubname, param: param, res: res, switched: switched};
 	});
-var $author$project$Show$init = A7(
+var $author$project$Show$init = A9(
 	$author$project$Show$Model,
 	'NO2',
+	'raw',
 	_List_fromArray(
 		[
-			A5($author$project$Show$BCType, 'bc1', 'sf', '2019', '7', ''),
-			A5($author$project$Show$BCType, 'bc2', 'intp_simple', '2019', '7', ''),
-			A5($author$project$Show$BCType, 'bc3', 'intp_sea', '2019', '7', '')
+			A5($author$project$Show$BCType, 'bc1', 'sf', '', '2019', '7'),
+			A5($author$project$Show$BCType, 'bc2', 'intp_simple', '', '2019', '7'),
+			A5($author$project$Show$BCType, 'bc3', 'intp_sea', '', '2019', '7')
 		]),
 	'sf',
+	'',
 	'2019',
 	'1',
 	3,
@@ -5420,8 +5422,16 @@ var $author$project$Show$update = F2(
 						model,
 						{param: param}),
 					$elm$core$Platform$Cmd$none);
+			case 'EditRes':
+				var resolution = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{res: resolution}),
+					$elm$core$Platform$Cmd$none);
 			case 'AddSelectNameMsg':
 				var name = msg.a;
+				var subname = (name === 'r_nrmse') ? 'r_70_nrmse_20' : '';
 				var nStats = (A2($elm$core$String$left, 4, name) === 'intp') ? '3' : '1';
 				return A2(
 					$elm$core$Debug$log,
@@ -5429,8 +5439,15 @@ var $author$project$Show$update = F2(
 					_Utils_Tuple2(
 						_Utils_update(
 							model,
-							{newNStats: nStats, newName: name}),
+							{newNStats: nStats, newName: name, newSubname: subname}),
 						$elm$core$Platform$Cmd$none));
+			case 'AddSelectSubnameMsg':
+				var subname = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{newSubname: subname}),
+					$elm$core$Platform$Cmd$none);
 			case 'AddSelectBaseMsg':
 				var base = msg.a;
 				return _Utils_Tuple2(
@@ -5448,7 +5465,7 @@ var $author$project$Show$update = F2(
 			case 'AddButtonMsg':
 				var incRecord = model.nRecords + 1;
 				var newId = 'bc' + $elm$core$String$fromInt(incRecord);
-				var newBCType = A5($author$project$Show$BCType, newId, model.newName, model.newBase, model.newNStats, '');
+				var newBCType = A5($author$project$Show$BCType, newId, model.newName, model.newSubname, model.newBase, model.newNStats);
 				var newModel = _Utils_update(
 					model,
 					{
@@ -5504,6 +5521,9 @@ var $author$project$Show$AddSelectNStatsMsg = function (a) {
 };
 var $author$project$Show$AddSelectNameMsg = function (a) {
 	return {$: 'AddSelectNameMsg', a: a};
+};
+var $author$project$Show$AddSelectSubnameMsg = function (a) {
+	return {$: 'AddSelectSubnameMsg', a: a};
 };
 var $rundis$elm_bootstrap$Bootstrap$Form$Select$Attrs = function (a) {
 	return {$: 'Attrs', a: a};
@@ -5797,7 +5817,7 @@ var $author$project$Show$listOptionsSelected = F2(
 				]));
 	});
 var $author$project$Show$modelNames = _List_fromArray(
-	['sf', 'intp_simple', 'intp_sea']);
+	['sf', 'intp_simple', 'intp_sea', 'r_nrmse']);
 var $rundis$elm_bootstrap$Bootstrap$Form$Select$OnChange = function (a) {
 	return {$: 'OnChange', a: a};
 };
@@ -6027,8 +6047,10 @@ var $rundis$elm_bootstrap$Bootstrap$Form$Select$select = F2(
 		return $rundis$elm_bootstrap$Bootstrap$Form$Select$view(
 			A2($rundis$elm_bootstrap$Bootstrap$Form$Select$create, options, items));
 	});
+var $author$project$Show$subModelNames = _List_fromArray(
+	['r_70_nrmse_20', 'r_70_nrmse_30', 'r_70_nrmse_40', 'r_70_nrmse_50', 'r_80_nrmse_20', 'r_80_nrmse_30', 'r_80_nrmse_40', 'r_80_nrmse_50', 'r_90_nrmse_20', 'r_90_nrmse_30', 'r_90_nrmse_40', 'r_90_nrmse_50']);
 var $author$project$Show$inputForm = function (model) {
-	var nStatsRange = (model.newName === 'sf') ? A2(
+	var nStatsRange = (A2($elm$core$String$left, 4, model.newName) === 'intp') ? A2(
 		$elm$core$List$map,
 		A2(
 			$elm$core$Basics$composeR,
@@ -6036,7 +6058,7 @@ var $author$project$Show$inputForm = function (model) {
 			function (opt) {
 				return A2($author$project$Show$listOptionsSelected, opt, model.newNStats);
 			}),
-		A2($elm$core$List$range, 1, 14)) : A2(
+		A2($elm$core$List$range, 3, 11)) : A2(
 		$elm$core$List$map,
 		A2(
 			$elm$core$Basics$composeR,
@@ -6044,7 +6066,9 @@ var $author$project$Show$inputForm = function (model) {
 			function (opt) {
 				return A2($author$project$Show$listOptionsSelected, opt, model.newNStats);
 			}),
-		A2($elm$core$List$range, 3, 11));
+		A2($elm$core$List$range, 1, 14));
+	var modelSubnameList = (model.newName === 'r_nrmse') ? $author$project$Show$subModelNames : _List_fromArray(
+		['-------------']);
 	return A2(
 		$rundis$elm_bootstrap$Bootstrap$Form$formInline,
 		_List_fromArray(
@@ -6081,6 +6105,35 @@ var $author$project$Show$inputForm = function (model) {
 								$rundis$elm_bootstrap$Bootstrap$Form$Select$onChange($author$project$Show$AddSelectNameMsg)
 							]),
 						A2($elm$core$List$map, $author$project$Show$listOptions, $author$project$Show$modelNames))
+					])),
+				A2(
+				$rundis$elm_bootstrap$Bootstrap$Form$group,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$rundis$elm_bootstrap$Bootstrap$Form$label,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$for('subnameInput')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Subname: ')
+							])),
+						A2(
+						$rundis$elm_bootstrap$Bootstrap$Form$Select$select,
+						_List_fromArray(
+							[
+								$rundis$elm_bootstrap$Bootstrap$Form$Select$id('subnameInput'),
+								$rundis$elm_bootstrap$Bootstrap$Form$Select$attrs(
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('ml-2 mr-3 my-2')
+									])),
+								$rundis$elm_bootstrap$Bootstrap$Form$Select$onChange($author$project$Show$AddSelectSubnameMsg)
+							]),
+						A2($elm$core$List$map, $author$project$Show$listOptions, modelSubnameList))
 					])),
 				A2(
 				$rundis$elm_bootstrap$Bootstrap$Form$group,
@@ -6795,6 +6848,13 @@ var $author$project$Show$toBCTypesTr = function (bctype) {
 				_List_Nil,
 				_List_fromArray(
 					[
+						$elm$html$Html$text(bctype.subname)
+					])),
+				A2(
+				$rundis$elm_bootstrap$Bootstrap$Table$td,
+				_List_Nil,
+				_List_fromArray(
+					[
 						$elm$html$Html$text(bctype.base)
 					])),
 				A2(
@@ -6853,6 +6913,13 @@ var $author$project$Show$showBCTypesTable = function (bctypeList) {
 						_List_Nil,
 						_List_fromArray(
 							[
+								$elm$html$Html$text('Subname')
+							])),
+						A2(
+						$rundis$elm_bootstrap$Bootstrap$Table$th,
+						_List_Nil,
+						_List_fromArray(
+							[
 								$elm$html$Html$text('N stations')
 							])),
 						A2(
@@ -6879,7 +6946,8 @@ var $elm$html$Html$Attributes$src = function (url) {
 		_VirtualDom_noJavaScriptOrHtmlUri(url));
 };
 var $author$project$Show$formatBCName = function (bctype) {
-	return bctype.name + ('\nN stations: ' + (bctype.n_stats + ('\nBase year: ' + bctype.base)));
+	var subnameStr = $elm$core$String$isEmpty(bctype.subname) ? '' : ('\n' + bctype.subname);
+	return bctype.name + (subnameStr + ('\nN stations: ' + (bctype.n_stats + ('\nBase year: ' + bctype.base))));
 };
 var $author$project$Show$toTh = function (str) {
 	return A2(
@@ -6941,23 +7009,48 @@ var $elm$core$String$pad = F3(
 					$elm$core$Basics$floor(half),
 					$elm$core$String$fromChar(_char))));
 	});
-var $author$project$Show$formatFileName = F3(
-	function (param, year, bctype) {
-		var nStatsStr = 'n_stats_' + bctype.n_stats;
+var $author$project$Show$formatFileName = F4(
+	function (resolution, param, year, bctype) {
+		var resSuffix = function () {
+			switch (resolution) {
+				case 'raw':
+					return '';
+				case 'TPU':
+					return 'tpu_mean';
+				case 'DCD':
+					return 'dcd_mean';
+				default:
+					return '';
+			}
+		}();
+		var resStr = function () {
+			switch (resolution) {
+				case 'raw':
+					return 'spatial';
+				case 'TPU':
+					return 'tpu_mean';
+				case 'DCD':
+					return 'dcd_mean';
+				default:
+					return 'spatial';
+			}
+		}();
+		var modelSubnameStr = (bctype.name === 'r_nrmse') ? (bctype.subname + '/') : '';
+		var nStatsStr = modelSubnameStr + ('n_stats_' + bctype.n_stats);
 		var fileNameRoot = param + ('_' + ($elm$core$String$fromInt(year) + ('_' + (A3(
 			$elm$core$String$pad,
 			2,
 			_Utils_chr('0'),
-			bctype.n_stats) + '_tpu_mean.png'))));
+			bctype.n_stats) + (resSuffix + '.png')))));
 		return A2(
 			$elm$core$String$join,
 			'/',
 			_List_fromArray(
-				[$author$project$Show$fileBase, bctype.name, bctype.base, param, nStatsStr, fileNameRoot]));
+				[$author$project$Show$fileBase, resStr, bctype.name, bctype.base, param, nStatsStr, fileNameRoot]));
 	});
-var $author$project$Show$toTd = F3(
-	function (param, year, bctype) {
-		var str = A3($author$project$Show$formatFileName, param, year, bctype);
+var $author$project$Show$toTd = F4(
+	function (resolution, param, year, bctype) {
+		var str = A4($author$project$Show$formatFileName, resolution, param, year, bctype);
 		return A2(
 			$elm$html$Html$td,
 			_List_Nil,
@@ -6972,8 +7065,8 @@ var $author$project$Show$toTd = F3(
 					_List_Nil)
 				]));
 	});
-var $author$project$Show$toTr = F3(
-	function (param, year, bctypeList) {
+var $author$project$Show$toTr = F4(
+	function (resolution, param, year, bctypeList) {
 		return A2(
 			$elm$html$Html$tr,
 			_List_Nil,
@@ -6990,12 +7083,12 @@ var $author$project$Show$toTr = F3(
 				A2(
 					$elm$core$List$map,
 					function (bctype) {
-						return A3($author$project$Show$toTd, param, year, bctype);
+						return A4($author$project$Show$toTd, resolution, param, year, bctype);
 					},
 					bctypeList)));
 	});
-var $author$project$Show$toHtmlTable = F3(
-	function (param, yearList, bctypeList) {
+var $author$project$Show$toHtmlTable = F4(
+	function (resolution, param, yearList, bctypeList) {
 		return A2(
 			$elm$html$Html$table,
 			_List_fromArray(
@@ -7008,7 +7101,7 @@ var $author$project$Show$toHtmlTable = F3(
 				A2(
 					$elm$core$List$map,
 					function (year) {
-						return A3($author$project$Show$toTr, param, year, bctypeList);
+						return A4($author$project$Show$toTr, resolution, param, year, bctypeList);
 					},
 					yearList)));
 	});
@@ -7029,6 +7122,17 @@ var $author$project$Show$view = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text('Parameter: '),
+						$author$project$Show$paramSelect(model)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('container w-25')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Resolution: '),
 						$author$project$Show$paramSelect(model)
 					])),
 				A2($elm$html$Html$br, _List_Nil, _List_Nil),
@@ -7073,7 +7177,7 @@ var $author$project$Show$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						A3($author$project$Show$toHtmlTable, model.param, $author$project$Show$years, model.bcTypes)
+						A4($author$project$Show$toHtmlTable, model.res, model.param, $author$project$Show$years, model.bcTypes)
 					]))
 			]));
 };
