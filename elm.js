@@ -6214,16 +6214,27 @@ var $author$project$Show$EditParam = function (a) {
 };
 var $author$project$Show$params = _List_fromArray(
 	['NO2', 'O3', 'O3_max_8hr_avg', 'SO2']);
-var $author$project$Show$paramSelect = function (model) {
-	return A2(
-		$rundis$elm_bootstrap$Bootstrap$Form$Select$select,
-		_List_fromArray(
-			[
-				$rundis$elm_bootstrap$Bootstrap$Form$Select$id('paramSelect'),
-				$rundis$elm_bootstrap$Bootstrap$Form$Select$onChange($author$project$Show$EditParam)
-			]),
-		A2($elm$core$List$map, $author$project$Show$listOptions, $author$project$Show$params));
+var $author$project$Show$paramSelect = A2(
+	$rundis$elm_bootstrap$Bootstrap$Form$Select$select,
+	_List_fromArray(
+		[
+			$rundis$elm_bootstrap$Bootstrap$Form$Select$id('paramSelect'),
+			$rundis$elm_bootstrap$Bootstrap$Form$Select$onChange($author$project$Show$EditParam)
+		]),
+	A2($elm$core$List$map, $author$project$Show$listOptions, $author$project$Show$params));
+var $author$project$Show$EditRes = function (a) {
+	return {$: 'EditRes', a: a};
 };
+var $author$project$Show$resList = _List_fromArray(
+	['raw', 'TPU', 'DCD']);
+var $author$project$Show$resSelect = A2(
+	$rundis$elm_bootstrap$Bootstrap$Form$Select$select,
+	_List_fromArray(
+		[
+			$rundis$elm_bootstrap$Bootstrap$Form$Select$id('resSelect'),
+			$rundis$elm_bootstrap$Bootstrap$Form$Select$onChange($author$project$Show$EditRes)
+		]),
+	A2($elm$core$List$map, $author$project$Show$listOptions, $author$project$Show$resList));
 var $rundis$elm_bootstrap$Bootstrap$Table$TableAttr = function (a) {
 	return {$: 'TableAttr', a: a};
 };
@@ -6945,36 +6956,124 @@ var $elm$html$Html$Attributes$src = function (url) {
 		'src',
 		_VirtualDom_noJavaScriptOrHtmlUri(url));
 };
-var $author$project$Show$formatBCName = function (bctype) {
-	var subnameStr = $elm$core$String$isEmpty(bctype.subname) ? '' : ('\n' + bctype.subname);
-	return bctype.name + (subnameStr + ('\nN stations: ' + (bctype.n_stats + ('\nBase year: ' + bctype.base))));
-};
-var $author$project$Show$toTh = function (str) {
-	return A2(
-		$elm$html$Html$th,
-		_List_Nil,
-		_List_fromArray(
-			[
-				$elm$html$Html$text(str)
-			]));
-};
+var $author$project$Show$toPlotTh = F2(
+	function (bctype, field) {
+		var value = function () {
+			switch (field) {
+				case 'name':
+					return bctype.name;
+				case 'subname':
+					return bctype.subname;
+				case 'n_stats':
+					return bctype.n_stats;
+				case 'base':
+					return bctype.base;
+				default:
+					return bctype.name;
+			}
+		}();
+		return A2(
+			$elm$html$Html$th,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('th_center')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text(value)
+				]));
+	});
 var $author$project$Show$toThead = function (bctypeList) {
 	return A2(
 		$elm$html$Html$thead,
 		_List_Nil,
-		A2(
-			$elm$core$List$cons,
-			A2(
-				$elm$html$Html$th,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$tr,
 				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Year')
-					])),
-			A2(
-				$elm$core$List$map,
-				A2($elm$core$Basics$composeR, $author$project$Show$formatBCName, $author$project$Show$toTh),
-				bctypeList)));
+				A2(
+					$elm$core$List$cons,
+					A2(
+						$elm$html$Html$th,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('th_center')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Name')
+							])),
+					A2(
+						$elm$core$List$map,
+						function (bctype) {
+							return A2($author$project$Show$toPlotTh, bctype, 'name');
+						},
+						bctypeList))),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				A2(
+					$elm$core$List$cons,
+					A2(
+						$elm$html$Html$th,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('th_center')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Subname')
+							])),
+					A2(
+						$elm$core$List$map,
+						function (bctype) {
+							return A2($author$project$Show$toPlotTh, bctype, 'subname');
+						},
+						bctypeList))),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				A2(
+					$elm$core$List$cons,
+					A2(
+						$elm$html$Html$th,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('th_center')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('N stations')
+							])),
+					A2(
+						$elm$core$List$map,
+						function (bctype) {
+							return A2($author$project$Show$toPlotTh, bctype, 'n_stats');
+						},
+						bctypeList))),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				A2(
+					$elm$core$List$cons,
+					A2(
+						$elm$html$Html$th,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('th_center')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Base year')
+							])),
+					A2(
+						$elm$core$List$map,
+						function (bctype) {
+							return A2($author$project$Show$toPlotTh, bctype, 'base');
+						},
+						bctypeList)))
+			]));
 };
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
@@ -7016,9 +7115,9 @@ var $author$project$Show$formatFileName = F4(
 				case 'raw':
 					return '';
 				case 'TPU':
-					return 'tpu_mean';
+					return '_tpu_mean';
 				case 'DCD':
-					return 'dcd_mean';
+					return '_dcd_mean';
 				default:
 					return '';
 			}
@@ -7035,8 +7134,8 @@ var $author$project$Show$formatFileName = F4(
 					return 'spatial';
 			}
 		}();
-		var modelSubnameStr = (bctype.name === 'r_nrmse') ? (bctype.subname + '/') : '';
-		var nStatsStr = modelSubnameStr + ('n_stats_' + bctype.n_stats);
+		var modelSubnameStr = (bctype.name === 'r_nrmse') ? ('/' + bctype.subname) : '';
+		var nStatsStr = 'n_stats_' + (bctype.n_stats + modelSubnameStr);
 		var fileNameRoot = param + ('_' + ($elm$core$String$fromInt(year) + ('_' + (A3(
 			$elm$core$String$pad,
 			2,
@@ -7122,7 +7221,7 @@ var $author$project$Show$view = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text('Parameter: '),
-						$author$project$Show$paramSelect(model)
+						$author$project$Show$paramSelect
 					])),
 				A2(
 				$elm$html$Html$div,
@@ -7133,14 +7232,14 @@ var $author$project$Show$view = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text('Resolution: '),
-						$author$project$Show$paramSelect(model)
+						$author$project$Show$resSelect
 					])),
 				A2($elm$html$Html$br, _List_Nil, _List_Nil),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('col-auto table-responsive container')
+						$elm$html$Html$Attributes$class('plots_table')
 					]),
 				_List_fromArray(
 					[

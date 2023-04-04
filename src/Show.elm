@@ -27,8 +27,8 @@ params =
     ]
 
 
-res : List String
-res =
+resList : List String
+resList =
     [ "raw", "TPU", "DCD" ]
 
 
@@ -108,13 +108,13 @@ formatFileName resolution param year bctype =
     let
         modelSubnameStr =
             if bctype.name == "r_nrmse" then
-                bctype.subname ++ "/"
+                "/" ++ bctype.subname
 
             else
                 ""
 
         nStatsStr =
-            modelSubnameStr ++ "n_stats_" ++ bctype.n_stats
+            "n_stats_" ++ bctype.n_stats ++ modelSubnameStr
 
         resStr =
             case resolution of
@@ -136,10 +136,10 @@ formatFileName resolution param year bctype =
                     ""
 
                 "TPU" ->
-                    "tpu_mean"
+                    "_tpu_mean"
 
                 "DCD" ->
-                    "dcd_mean"
+                    "_dcd_mean"
 
                 _ ->
                     ""
@@ -183,44 +183,76 @@ toTr resolution param year bctypeList =
         )
 
 
-formatBCName : BCType -> String
-formatBCName bctype =
+-- formatBCName : BCType -> String
+-- formatBCName bctype =
+--     let
+--         subnameStr =
+--             if String.isEmpty bctype.subname then
+--                 ""
+--
+--             else
+--                 "\n" ++ bctype.subname
+--     in
+--     bctype.name
+--         ++ subnameStr
+--         ++ "\nN stations: "
+--         ++ bctype.n_stats
+--         ++ "\nBase year: "
+--         ++ bctype.base
+
+
+toPlotTh : BCType -> String -> Html Msg
+toPlotTh bctype field =
     let
-        subnameStr =
-            if String.isEmpty bctype.subname then
-                ""
+        value =
+            case field of
+                "name" ->
+                    bctype.name
 
-            else
-                "\n" ++ bctype.subname
+                "subname" ->
+                    bctype.subname
+
+                "n_stats" ->
+                    bctype.n_stats
+
+                "base" ->
+                    bctype.base
+
+                _ ->
+                    bctype.name
     in
-    bctype.name
-        ++ subnameStr
-        ++ "\nN stations: "
-        ++ bctype.n_stats
-        ++ "\nBase year: "
-        ++ bctype.base
-
-
-toTh : String -> Html Msg
-toTh str =
-    th [] [ text str ]
+    th [ class "th_center" ] [ text value ]
 
 
 toThead : List BCType -> Html Msg
 toThead bctypeList =
     thead []
-        (th [] [ text "Year" ]
-            :: List.map (formatBCName >> toTh) bctypeList
-        )
+        [ tr []
+            (th [ class "th_center" ] [ text "Name" ]
+                :: List.map (\bctype -> toPlotTh bctype "name") bctypeList
+            )
+        , tr []
+            (th [ class "th_center" ] [ text "Subname" ]
+                :: List.map (\bctype -> toPlotTh bctype "subname") bctypeList
+            )
+        , tr []
+            (th [ class "th_center" ] [ text "N stations" ]
+                :: List.map (\bctype -> toPlotTh bctype "n_stats") bctypeList
+            )
+        , tr []
+            (th [ class "th_center" ] [ text "Base year" ]
+                :: List.map (\bctype -> toPlotTh bctype "base") bctypeList
+            )
+        ]
 
 
 toHtmlTable : String -> String -> List Int -> List BCType -> Html Msg
 toHtmlTable resolution param yearList bctypeList =
     table [ class "center" ]
         (toThead bctypeList
-            :: List.map 
-            (\year -> toTr resolution param year bctypeList) 
-            yearList
+            :: List.map
+                (\year -> toTr resolution param year bctypeList)
+                yearList
         )
 
 
@@ -271,13 +303,17 @@ update msg model =
 
         AddSelectNameMsg name ->
             let
+                -- change range of number of station
+                -- intp_sea or intp_simple: 3 to 11
+                -- sf or r_nrmse: 1 to 14
                 nStats =
                     if left 4 name == "intp" then
                         "3"
 
                     else
                         "1"
-
+                
+                -- set default subname for r_nrmse
                 subname =
                     if name == "r_nrmse" then
                         "r_70_nrmse_20"
@@ -374,8 +410,10 @@ listOptionsSelected opt default =
         [ text opt ]
 
 
-paramSelect : Model -> Html Msg
-paramSelect model =
+-- paramSelect : Model -> Html Msg
+-- paramSelect model =
+paramSelect : Html Msg
+paramSelect =
     Select.select
         [ Select.id "paramSelect"
         , Select.onChange EditParam
@@ -383,13 +421,15 @@ paramSelect model =
         (List.map listOptions params)
 
 
-resSelect : Model -> Html Msg
-resSelect model =
+-- resSelect : Model -> Html Msg
+-- resSelect model =
+resSelect : Html Msg 
+resSelect =
     Select.select
         [ Select.id "resSelect"
         , Select.onChange EditRes
         ]
-        (List.map listOptions res)
+        (List.map listOptions resList)
 
 
 inputForm : Model -> Html Msg
@@ -466,15 +506,15 @@ view model =
     div []
         [ div [ class "container w-25" ]
             [ text "Parameter: "
-            , paramSelect model
+            , paramSelect
             ]
         , div [ class "container w-25" ]
             [ text "Resolution: "
-            , paramSelect model
+            , resSelect
             ]
         , br [] []
         , div
-            [ class "col-auto table-responsive container"
+            [ class "plots_table"
             ]
             [ showBCTypesTable model.bcTypes ]
         , div []

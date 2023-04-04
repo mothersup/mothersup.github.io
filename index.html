@@ -19,6 +19,8 @@
         }
 
         .img-center {
+            width: 50%;
+            height: auto;
             margin: auto;
             display: block;
         }
@@ -28,43 +30,49 @@
             margin-right: auto;
         }
 
-        th {
-            word-wrap: break-word;
-            white-space: pre;
-            text-align: center;
-        }
-
-        .table-fixed {
+        .plots_table {
+            overflow-x: auto;
+            overflow-y: scroll;
             width: 50%;
             margin: 0 auto;
+            max-height: 300px;
+        }
 
-            tbody {
-                height: 200px;
-                overflow-y: auto;
-                width: 100%;
-            }
+        .plots_table thead th {
+            position: sticky;
+            top: 0;
+            background: #eee;
+        }
 
-            thead,
-            tbody,
-            tr,
-            td,
-            th {
-                display: block;
-            }
 
-            tbody {
-                td {
-                    float: left;
-                }
-            }
+        /* width */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
 
-            thead {
-                tr {
-                    th {
-                        float: left;
-                    }
-                }
-            }
+        /* Track */
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+
+        /* Handle on hover */
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+
+        < !-- .plots_table th {
+            -->< !-- text-align: center;
+            -->< !--
+        }
+
+        -->.th_center {
+            text-align: center;
         }
     </style>
     <script src="jquery-3.6.3.min.js"></script>
