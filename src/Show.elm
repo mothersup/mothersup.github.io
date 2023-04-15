@@ -121,6 +121,9 @@ type Msg
     | DeleteButtonMsg String
 
 
+{-| Create a string for the file name of the plot specified 
+by the resolution, parameter, year and BCType
+-}
 formatFileName : String -> String -> Int -> BCType -> String
 formatFileName resolution param year bctype =
     let
@@ -193,6 +196,8 @@ formatFileName resolution param year bctype =
         ]
 
 
+{-| Display image as a table entry
+-}
 toTd : String -> String -> Int -> BCType -> Html msg
 toTd resolution param year bctype =
     let
@@ -202,6 +207,8 @@ toTd resolution param year bctype =
     td [] [ img [ src str ] [] ]
 
 
+{-| Display images in a row in  a table
+-}
 toTr : String -> String -> Int -> List BCType -> Html msg
 toTr resolution param year bctypeList =
     tr []
