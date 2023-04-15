@@ -5,7 +5,9 @@ import Bootstrap.Button as Button
 import Bootstrap.Form as Form
 import Bootstrap.Form.Select as Select
 import Bootstrap.Table as Table
+import Bootstrap.Utilities.Spacing as Spacing
 import Browser
+import Dict exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -21,9 +23,9 @@ import String exposing (..)
 params : List String
 params =
     [ "NO2"
-    , "O3"
-    , "O3_max_8hr_avg"
+    , "O3 (max 8hr avg)"
     , "SO2"
+    , "PM2.5"
     ]
 
 
@@ -92,6 +94,21 @@ type alias Model =
     }
 
 
+defaultModels : Dict String BCType
+defaultModels =
+    Dict.fromList
+        [ ( "NO2", BCType "0" "r_nrmse" "r_90_nrmse_50" "2019" "3" )
+        , ( "O3 (max 8hr avg)", BCType "0" "r_nrmse" "r_70_nrmse_40" "2019" "5" )
+        , ( "SO2", BCType "0" "r_nrmse" "r_70_nrmse_40" "2021" "3" )
+        , ( "PM2.5", BCType "0" "r_nrmse" "r_70_nrmse_50" "2021" "4" )
+        ]
+
+
+defaultBCType : BCType
+defaultBCType =
+    BCType "0" "r_nrmse" "r_90_nrmse_50" "2019" "3"
+
+
 type Msg
     = EditParam String
     | EditRes String
@@ -100,6 +117,7 @@ type Msg
     | AddSelectBaseMsg String
     | AddSelectNStatsMsg String
     | AddButtonMsg
+    | AddDefaultButtonMsg
     | DeleteButtonMsg String
 
 
@@ -144,8 +162,19 @@ formatFileName resolution param year bctype =
                 _ ->
                     ""
 
+        varSaveName =
+            case param of
+                "O3 (max 8hr avg)" ->
+                    "O3_max_8hr_avg"
+
+                "PM2.5" ->
+                    "PM25"
+
+                _ ->
+                    param
+
         fileNameRoot =
-            param
+            varSaveName
                 ++ "_"
                 ++ String.fromInt year
                 ++ "_"
@@ -158,7 +187,7 @@ formatFileName resolution param year bctype =
         , resStr
         , bctype.name
         , bctype.base
-        , param
+        , varSaveName
         , nStatsStr
         , fileNameRoot
         ]
@@ -181,24 +210,6 @@ toTr resolution param year bctypeList =
                 (\bctype -> toTd resolution param year bctype)
                 bctypeList
         )
-
-
--- formatBCName : BCType -> String
--- formatBCName bctype =
---     let
---         subnameStr =
---             if String.isEmpty bctype.subname then
---                 ""
---
---             else
---                 "\n" ++ bctype.subname
---     in
---     bctype.name
---         ++ subnameStr
---         ++ "\nN stations: "
---         ++ bctype.n_stats
---         ++ "\nBase year: "
---         ++ bctype.base
 
 
 toPlotTh : BCType -> String -> Html Msg
@@ -312,7 +323,7 @@ update msg model =
 
                     else
                         "1"
-                
+
                 -- set default subname for r_nrmse
                 subname =
                     if name == "r_nrmse" then
@@ -338,6 +349,29 @@ update msg model =
 
         AddSelectNStatsMsg nStats ->
             ( { model | newNStats = nStats }, Cmd.none )
+
+        AddDefaultButtonMsg ->
+            let
+                incRecord =
+                    model.nRecords + 1
+
+                newId =
+                    "bc" ++ String.fromInt incRecord
+
+                newBCTypeTmplt =
+                    Dict.get model.param defaultModels
+                        |> Maybe.withDefault defaultBCType
+
+                newBCType =
+                    { newBCTypeTmplt | id = newId }
+
+                newModel =
+                    { model
+                        | bcTypes = model.bcTypes ++ [ newBCType ]
+                        , nRecords = incRecord
+                    }
+            in
+            ( newModel, Cmd.none )
 
         AddButtonMsg ->
             let
@@ -384,9 +418,7 @@ init =
     Model
         "NO2"
         "raw"
-        [ BCType "bc1" "sf" "" "2019" "7"
-        , BCType "bc2" "intp_simple" "" "2019" "7"
-        , BCType "bc3" "intp_sea" "" "2019" "7"
+        [ BCType "bc1" "r_nrmse" "r_90_nrmse_50" "2019" "3"
         ]
         "sf"
         ""
@@ -410,23 +442,31 @@ listOptionsSelected opt default =
         [ text opt ]
 
 
+
 -- paramSelect : Model -> Html Msg
 -- paramSelect model =
+
+
 paramSelect : Html Msg
 paramSelect =
     Select.select
         [ Select.id "paramSelect"
+        , Select.attrs [ Spacing.ml2, Spacing.mr4 ]
         , Select.onChange EditParam
         ]
         (List.map listOptions params)
 
 
+
 -- resSelect : Model -> Html Msg
 -- resSelect model =
-resSelect : Html Msg 
+
+
+resSelect : Html Msg
 resSelect =
     Select.select
         [ Select.id "resSelect"
+        , Select.attrs [ Spacing.ml2, Spacing.mr4 ]
         , Select.onChange EditRes
         ]
         (List.map listOptions resList)
@@ -463,7 +503,7 @@ inputForm model =
             [ Form.label [ for "nameInput" ] [ text "Name: " ]
             , Select.select
                 [ Select.id "nameInput"
-                , Select.attrs [ class "ml-2 mr-3 my-2" ]
+                , Select.attrs [ Spacing.mx2 ]
                 , Select.onChange AddSelectNameMsg
                 ]
                 (List.map listOptions modelNames)
@@ -472,7 +512,7 @@ inputForm model =
             [ Form.label [ for "subnameInput" ] [ text "Subname: " ]
             , Select.select
                 [ Select.id "subnameInput"
-                , Select.attrs [ class "ml-2 mr-3 my-2" ]
+                , Select.attrs [ Spacing.mx2 ]
                 , Select.onChange AddSelectSubnameMsg
                 ]
                 (List.map listOptions modelSubnameList)
@@ -481,7 +521,7 @@ inputForm model =
             [ Form.label [ for "baseInput" ] [ text "Base year: " ]
             , Select.select
                 [ Select.id "baseInput"
-                , Select.attrs [ class "ml-2 mr-3 my-2" ]
+                , Select.attrs [ Spacing.mx2 ]
                 , Select.onChange AddSelectBaseMsg
                 ]
                 (List.map (String.fromInt >> listOptions) baseYears)
@@ -490,27 +530,38 @@ inputForm model =
             [ Form.label [ for "nStatsInput" ] [ text "N stations: " ]
             , Select.select
                 [ Select.id "nStatsInput"
-                , Select.attrs [ class "ml-2 mr-3 my-2" ]
+                , Select.attrs [ Spacing.mx2 ]
                 , Select.onChange AddSelectNStatsMsg
                 ]
                 nStatsRange
             ]
         , Button.button
-            [ Button.primary, Button.onClick AddButtonMsg ]
+            [ Button.primary
+            , Button.attrs [ Spacing.mx2 ]
+            , Button.onClick AddButtonMsg
+            ]
             [ text "Add model" ]
+        , Button.button
+            [ Button.info
+            , Button.attrs [ Spacing.mx2 ]
+            , Button.onClick AddDefaultButtonMsg
+            ]
+            [ text "Add default" ]
         ]
 
 
 view : Model -> Html Msg
 view model =
     div []
-        [ div [ class "container w-25" ]
-            [ text "Parameter: "
-            , paramSelect
-            ]
-        , div [ class "container w-25" ]
-            [ text "Resolution: "
-            , resSelect
+        [ Form.formInline [ class "justify-content-center" ]
+            [ Form.group []
+                [ Form.label [ for "paramSelect" ] [ text "Parameter: " ]
+                , paramSelect
+                ]
+            , Form.group []
+                [ Form.label [ for "resSelect" ] [ text "Resolution: " ]
+                , resSelect
+                ]
             ]
         , br [] []
         , div

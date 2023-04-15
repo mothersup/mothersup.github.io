@@ -5210,9 +5210,7 @@ var $author$project$Show$init = A9(
 	'raw',
 	_List_fromArray(
 		[
-			A5($author$project$Show$BCType, 'bc1', 'sf', '', '2019', '7'),
-			A5($author$project$Show$BCType, 'bc2', 'intp_simple', '', '2019', '7'),
-			A5($author$project$Show$BCType, 'bc3', 'intp_sea', '', '2019', '7')
+			A5($author$project$Show$BCType, 'bc1', 'r_nrmse', 'r_90_nrmse_50', '2019', '3')
 		]),
 	'sf',
 	'',
@@ -5224,6 +5222,146 @@ var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+var $author$project$Show$defaultBCType = A5($author$project$Show$BCType, '0', 'r_nrmse', 'r_90_nrmse_50', '2019', '3');
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
+var $elm$core$Dict$Black = {$: 'Black'};
+var $elm$core$Dict$RBNode_elm_builtin = F5(
+	function (a, b, c, d, e) {
+		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
+	});
+var $elm$core$Dict$Red = {$: 'Red'};
+var $elm$core$Dict$balance = F5(
+	function (color, key, value, left, right) {
+		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
+			var _v1 = right.a;
+			var rK = right.b;
+			var rV = right.c;
+			var rLeft = right.d;
+			var rRight = right.e;
+			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
+				var _v3 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var lLeft = left.d;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					key,
+					value,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					color,
+					rK,
+					rV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, left, rLeft),
+					rRight);
+			}
+		} else {
+			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
+				var _v5 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var _v6 = left.d;
+				var _v7 = _v6.a;
+				var llK = _v6.b;
+				var llV = _v6.c;
+				var llLeft = _v6.d;
+				var llRight = _v6.e;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					lK,
+					lV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, key, value, lRight, right));
+			} else {
+				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
+			}
+		}
+	});
+var $elm$core$Basics$compare = _Utils_compare;
+var $elm$core$Dict$insertHelp = F3(
+	function (key, value, dict) {
+		if (dict.$ === 'RBEmpty_elm_builtin') {
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
+		} else {
+			var nColor = dict.a;
+			var nKey = dict.b;
+			var nValue = dict.c;
+			var nLeft = dict.d;
+			var nRight = dict.e;
+			var _v1 = A2($elm$core$Basics$compare, key, nKey);
+			switch (_v1.$) {
+				case 'LT':
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						A3($elm$core$Dict$insertHelp, key, value, nLeft),
+						nRight);
+				case 'EQ':
+					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
+				default:
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						nLeft,
+						A3($elm$core$Dict$insertHelp, key, value, nRight));
+			}
+		}
+	});
+var $elm$core$Dict$insert = F3(
+	function (key, value, dict) {
+		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
+		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
+var $elm$core$Dict$fromList = function (assocs) {
+	return A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_v0, dict) {
+				var key = _v0.a;
+				var value = _v0.b;
+				return A3($elm$core$Dict$insert, key, value, dict);
+			}),
+		$elm$core$Dict$empty,
+		assocs);
+};
+var $author$project$Show$defaultModels = $elm$core$Dict$fromList(
+	_List_fromArray(
+		[
+			_Utils_Tuple2(
+			'NO2',
+			A5($author$project$Show$BCType, '0', 'r_nrmse', 'r_90_nrmse_50', '2019', '3')),
+			_Utils_Tuple2(
+			'O3 (max 8hr avg)',
+			A5($author$project$Show$BCType, '0', 'r_nrmse', 'r_70_nrmse_40', '2019', '5')),
+			_Utils_Tuple2(
+			'SO2',
+			A5($author$project$Show$BCType, '0', 'r_nrmse', 'r_70_nrmse_40', '2021', '3')),
+			_Utils_Tuple2(
+			'PM2.5',
+			A5($author$project$Show$BCType, '0', 'r_nrmse', 'r_70_nrmse_50', '2021', '4'))
+		]));
 var $elm_community$list_extra$List$Extra$findIndexHelp = F3(
 	function (index, predicate, list) {
 		findIndexHelp:
@@ -5248,6 +5386,37 @@ var $elm_community$list_extra$List$Extra$findIndexHelp = F3(
 		}
 	});
 var $elm_community$list_extra$List$Extra$findIndex = $elm_community$list_extra$List$Extra$findIndexHelp(0);
+var $elm$core$Dict$get = F2(
+	function (targetKey, dict) {
+		get:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
+				switch (_v1.$) {
+					case 'LT':
+						var $temp$targetKey = targetKey,
+							$temp$dict = left;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+					case 'EQ':
+						return $elm$core$Maybe$Just(value);
+					default:
+						var $temp$targetKey = targetKey,
+							$temp$dict = right;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+				}
+			}
+		}
+	});
 var $elm$core$Debug$log = _Debug_log;
 var $elm$core$List$drop = F2(
 	function (n, list) {
@@ -5412,6 +5581,15 @@ var $elm_community$list_extra$List$Extra$removeAt = F2(
 			}
 		}
 	});
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
 var $author$project$Show$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -5462,6 +5640,26 @@ var $author$project$Show$update = F2(
 						model,
 						{newNStats: nStats}),
 					$elm$core$Platform$Cmd$none);
+			case 'AddDefaultButtonMsg':
+				var newBCTypeTmplt = A2(
+					$elm$core$Maybe$withDefault,
+					$author$project$Show$defaultBCType,
+					A2($elm$core$Dict$get, model.param, $author$project$Show$defaultModels));
+				var incRecord = model.nRecords + 1;
+				var newId = 'bc' + $elm$core$String$fromInt(incRecord);
+				var newBCType = _Utils_update(
+					newBCTypeTmplt,
+					{id: newId});
+				var newModel = _Utils_update(
+					model,
+					{
+						bcTypes: _Utils_ap(
+							model.bcTypes,
+							_List_fromArray(
+								[newBCType])),
+						nRecords: incRecord
+					});
+				return _Utils_Tuple2(newModel, $elm$core$Platform$Cmd$none);
 			case 'AddButtonMsg':
 				var incRecord = model.nRecords + 1;
 				var newId = 'bc' + $elm$core$String$fromInt(incRecord);
@@ -5511,8 +5709,48 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $author$project$Show$fileBase = 'https://hkustconnect-my.sharepoint.com/personal/yhsha_connect_ust_hk/Documents/plots';
+var $elm$html$Html$Attributes$for = $elm$html$Html$Attributes$stringProperty('htmlFor');
+var $elm$html$Html$form = _VirtualDom_node('form');
+var $rundis$elm_bootstrap$Bootstrap$Form$form = F2(
+	function (attributes, children) {
+		return A2($elm$html$Html$form, attributes, children);
+	});
+var $rundis$elm_bootstrap$Bootstrap$Form$formInline = function (attributes) {
+	return $rundis$elm_bootstrap$Bootstrap$Form$form(
+		A2(
+			$elm$core$List$cons,
+			$elm$html$Html$Attributes$class('form-inline'),
+			attributes));
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$applyModifier = F2(
+	function (modifier, options) {
+		var value = modifier.a;
+		return _Utils_update(
+			options,
+			{
+				attributes: _Utils_ap(options.attributes, value)
+			});
+	});
+var $rundis$elm_bootstrap$Bootstrap$Form$defaultOptions = {attributes: _List_Nil};
+var $rundis$elm_bootstrap$Bootstrap$Form$toAttributes = function (modifiers) {
+	var options = A3($elm$core$List$foldl, $rundis$elm_bootstrap$Bootstrap$Form$applyModifier, $rundis$elm_bootstrap$Bootstrap$Form$defaultOptions, modifiers);
+	return _Utils_ap(
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('form-group')
+			]),
+		options.attributes);
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$group = F2(
+	function (options, children) {
+		return A2(
+			$elm$html$Html$div,
+			$rundis$elm_bootstrap$Bootstrap$Form$toAttributes(options),
+			children);
+	});
 var $elm$html$Html$img = _VirtualDom_node('img');
 var $author$project$Show$AddButtonMsg = {$: 'AddButtonMsg'};
+var $author$project$Show$AddDefaultButtonMsg = {$: 'AddDefaultButtonMsg'};
 var $author$project$Show$AddSelectBaseMsg = function (a) {
 	return {$: 'AddSelectBaseMsg', a: a};
 };
@@ -5524,6 +5762,12 @@ var $author$project$Show$AddSelectNameMsg = function (a) {
 };
 var $author$project$Show$AddSelectSubnameMsg = function (a) {
 	return {$: 'AddSelectSubnameMsg', a: a};
+};
+var $rundis$elm_bootstrap$Bootstrap$Internal$Button$Attrs = function (a) {
+	return {$: 'Attrs', a: a};
+};
+var $rundis$elm_bootstrap$Bootstrap$Button$attrs = function (attrs_) {
+	return $rundis$elm_bootstrap$Bootstrap$Internal$Button$Attrs(attrs_);
 };
 var $rundis$elm_bootstrap$Bootstrap$Form$Select$Attrs = function (a) {
 	return {$: 'Attrs', a: a};
@@ -5712,51 +5956,21 @@ var $elm$core$Basics$composeR = F3(
 		return g(
 			f(x));
 	});
-var $elm$html$Html$Attributes$for = $elm$html$Html$Attributes$stringProperty('htmlFor');
-var $elm$html$Html$form = _VirtualDom_node('form');
-var $rundis$elm_bootstrap$Bootstrap$Form$form = F2(
-	function (attributes, children) {
-		return A2($elm$html$Html$form, attributes, children);
-	});
-var $rundis$elm_bootstrap$Bootstrap$Form$formInline = function (attributes) {
-	return $rundis$elm_bootstrap$Bootstrap$Form$form(
-		A2(
-			$elm$core$List$cons,
-			$elm$html$Html$Attributes$class('form-inline'),
-			attributes));
-};
-var $rundis$elm_bootstrap$Bootstrap$Form$applyModifier = F2(
-	function (modifier, options) {
-		var value = modifier.a;
-		return _Utils_update(
-			options,
-			{
-				attributes: _Utils_ap(options.attributes, value)
-			});
-	});
-var $rundis$elm_bootstrap$Bootstrap$Form$defaultOptions = {attributes: _List_Nil};
-var $rundis$elm_bootstrap$Bootstrap$Form$toAttributes = function (modifiers) {
-	var options = A3($elm$core$List$foldl, $rundis$elm_bootstrap$Bootstrap$Form$applyModifier, $rundis$elm_bootstrap$Bootstrap$Form$defaultOptions, modifiers);
-	return _Utils_ap(
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$class('form-group')
-			]),
-		options.attributes);
-};
-var $rundis$elm_bootstrap$Bootstrap$Form$group = F2(
-	function (options, children) {
-		return A2(
-			$elm$html$Html$div,
-			$rundis$elm_bootstrap$Bootstrap$Form$toAttributes(options),
-			children);
-	});
 var $rundis$elm_bootstrap$Bootstrap$Form$Select$Id = function (a) {
 	return {$: 'Id', a: a};
 };
 var $rundis$elm_bootstrap$Bootstrap$Form$Select$id = function (id_) {
 	return $rundis$elm_bootstrap$Bootstrap$Form$Select$Id(id_);
 };
+var $rundis$elm_bootstrap$Bootstrap$Internal$Button$Coloring = function (a) {
+	return {$: 'Coloring', a: a};
+};
+var $rundis$elm_bootstrap$Bootstrap$Internal$Button$Info = {$: 'Info'};
+var $rundis$elm_bootstrap$Bootstrap$Internal$Button$Roled = function (a) {
+	return {$: 'Roled', a: a};
+};
+var $rundis$elm_bootstrap$Bootstrap$Button$info = $rundis$elm_bootstrap$Bootstrap$Internal$Button$Coloring(
+	$rundis$elm_bootstrap$Bootstrap$Internal$Button$Roled($rundis$elm_bootstrap$Bootstrap$Internal$Button$Info));
 var $elm$html$Html$label = _VirtualDom_node('label');
 var $rundis$elm_bootstrap$Bootstrap$Form$label = F2(
 	function (attributes, children) {
@@ -5818,17 +6032,12 @@ var $author$project$Show$listOptionsSelected = F2(
 	});
 var $author$project$Show$modelNames = _List_fromArray(
 	['sf', 'intp_simple', 'intp_sea', 'r_nrmse']);
+var $rundis$elm_bootstrap$Bootstrap$Utilities$Spacing$mx2 = $elm$html$Html$Attributes$class('mx-2');
 var $rundis$elm_bootstrap$Bootstrap$Form$Select$OnChange = function (a) {
 	return {$: 'OnChange', a: a};
 };
 var $rundis$elm_bootstrap$Bootstrap$Form$Select$onChange = function (toMsg) {
 	return $rundis$elm_bootstrap$Bootstrap$Form$Select$OnChange(toMsg);
-};
-var $rundis$elm_bootstrap$Bootstrap$Internal$Button$Attrs = function (a) {
-	return {$: 'Attrs', a: a};
-};
-var $rundis$elm_bootstrap$Bootstrap$Button$attrs = function (attrs_) {
-	return $rundis$elm_bootstrap$Bootstrap$Internal$Button$Attrs(attrs_);
 };
 var $elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
 	return {$: 'MayPreventDefault', a: a};
@@ -5852,13 +6061,7 @@ var $rundis$elm_bootstrap$Bootstrap$Button$onClick = function (message) {
 					_Utils_Tuple2(message, true)))
 			]));
 };
-var $rundis$elm_bootstrap$Bootstrap$Internal$Button$Coloring = function (a) {
-	return {$: 'Coloring', a: a};
-};
 var $rundis$elm_bootstrap$Bootstrap$Internal$Button$Primary = {$: 'Primary'};
-var $rundis$elm_bootstrap$Bootstrap$Internal$Button$Roled = function (a) {
-	return {$: 'Roled', a: a};
-};
 var $rundis$elm_bootstrap$Bootstrap$Button$primary = $rundis$elm_bootstrap$Bootstrap$Internal$Button$Coloring(
 	$rundis$elm_bootstrap$Bootstrap$Internal$Button$Roled($rundis$elm_bootstrap$Bootstrap$Internal$Button$Primary));
 var $rundis$elm_bootstrap$Bootstrap$Form$Select$Select = function (a) {
@@ -6099,9 +6302,7 @@ var $author$project$Show$inputForm = function (model) {
 								$rundis$elm_bootstrap$Bootstrap$Form$Select$id('nameInput'),
 								$rundis$elm_bootstrap$Bootstrap$Form$Select$attrs(
 								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('ml-2 mr-3 my-2')
-									])),
+									[$rundis$elm_bootstrap$Bootstrap$Utilities$Spacing$mx2])),
 								$rundis$elm_bootstrap$Bootstrap$Form$Select$onChange($author$project$Show$AddSelectNameMsg)
 							]),
 						A2($elm$core$List$map, $author$project$Show$listOptions, $author$project$Show$modelNames))
@@ -6128,9 +6329,7 @@ var $author$project$Show$inputForm = function (model) {
 								$rundis$elm_bootstrap$Bootstrap$Form$Select$id('subnameInput'),
 								$rundis$elm_bootstrap$Bootstrap$Form$Select$attrs(
 								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('ml-2 mr-3 my-2')
-									])),
+									[$rundis$elm_bootstrap$Bootstrap$Utilities$Spacing$mx2])),
 								$rundis$elm_bootstrap$Bootstrap$Form$Select$onChange($author$project$Show$AddSelectSubnameMsg)
 							]),
 						A2($elm$core$List$map, $author$project$Show$listOptions, modelSubnameList))
@@ -6157,9 +6356,7 @@ var $author$project$Show$inputForm = function (model) {
 								$rundis$elm_bootstrap$Bootstrap$Form$Select$id('baseInput'),
 								$rundis$elm_bootstrap$Bootstrap$Form$Select$attrs(
 								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('ml-2 mr-3 my-2')
-									])),
+									[$rundis$elm_bootstrap$Bootstrap$Utilities$Spacing$mx2])),
 								$rundis$elm_bootstrap$Bootstrap$Form$Select$onChange($author$project$Show$AddSelectBaseMsg)
 							]),
 						A2(
@@ -6189,9 +6386,7 @@ var $author$project$Show$inputForm = function (model) {
 								$rundis$elm_bootstrap$Bootstrap$Form$Select$id('nStatsInput'),
 								$rundis$elm_bootstrap$Bootstrap$Form$Select$attrs(
 								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('ml-2 mr-3 my-2')
-									])),
+									[$rundis$elm_bootstrap$Bootstrap$Utilities$Spacing$mx2])),
 								$rundis$elm_bootstrap$Bootstrap$Form$Select$onChange($author$project$Show$AddSelectNStatsMsg)
 							]),
 						nStatsRange)
@@ -6201,24 +6396,46 @@ var $author$project$Show$inputForm = function (model) {
 				_List_fromArray(
 					[
 						$rundis$elm_bootstrap$Bootstrap$Button$primary,
+						$rundis$elm_bootstrap$Bootstrap$Button$attrs(
+						_List_fromArray(
+							[$rundis$elm_bootstrap$Bootstrap$Utilities$Spacing$mx2])),
 						$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Show$AddButtonMsg)
 					]),
 				_List_fromArray(
 					[
 						$elm$html$Html$text('Add model')
+					])),
+				A2(
+				$rundis$elm_bootstrap$Bootstrap$Button$button,
+				_List_fromArray(
+					[
+						$rundis$elm_bootstrap$Bootstrap$Button$info,
+						$rundis$elm_bootstrap$Bootstrap$Button$attrs(
+						_List_fromArray(
+							[$rundis$elm_bootstrap$Bootstrap$Utilities$Spacing$mx2])),
+						$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Show$AddDefaultButtonMsg)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Add default')
 					]))
 			]));
 };
 var $author$project$Show$EditParam = function (a) {
 	return {$: 'EditParam', a: a};
 };
+var $rundis$elm_bootstrap$Bootstrap$Utilities$Spacing$ml2 = $elm$html$Html$Attributes$class('ml-2');
+var $rundis$elm_bootstrap$Bootstrap$Utilities$Spacing$mr4 = $elm$html$Html$Attributes$class('mr-4');
 var $author$project$Show$params = _List_fromArray(
-	['NO2', 'O3', 'O3_max_8hr_avg', 'SO2']);
+	['NO2', 'O3 (max 8hr avg)', 'SO2', 'PM2.5']);
 var $author$project$Show$paramSelect = A2(
 	$rundis$elm_bootstrap$Bootstrap$Form$Select$select,
 	_List_fromArray(
 		[
 			$rundis$elm_bootstrap$Bootstrap$Form$Select$id('paramSelect'),
+			$rundis$elm_bootstrap$Bootstrap$Form$Select$attrs(
+			_List_fromArray(
+				[$rundis$elm_bootstrap$Bootstrap$Utilities$Spacing$ml2, $rundis$elm_bootstrap$Bootstrap$Utilities$Spacing$mr4])),
 			$rundis$elm_bootstrap$Bootstrap$Form$Select$onChange($author$project$Show$EditParam)
 		]),
 	A2($elm$core$List$map, $author$project$Show$listOptions, $author$project$Show$params));
@@ -6232,6 +6449,9 @@ var $author$project$Show$resSelect = A2(
 	_List_fromArray(
 		[
 			$rundis$elm_bootstrap$Bootstrap$Form$Select$id('resSelect'),
+			$rundis$elm_bootstrap$Bootstrap$Form$Select$attrs(
+			_List_fromArray(
+				[$rundis$elm_bootstrap$Bootstrap$Utilities$Spacing$ml2, $rundis$elm_bootstrap$Bootstrap$Utilities$Spacing$mr4])),
 			$rundis$elm_bootstrap$Bootstrap$Form$Select$onChange($author$project$Show$EditRes)
 		]),
 	A2($elm$core$List$map, $author$project$Show$listOptions, $author$project$Show$resList));
@@ -6453,15 +6673,6 @@ var $elm$core$List$head = function (list) {
 		return $elm$core$Maybe$Nothing;
 	}
 };
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
 var $rundis$elm_bootstrap$Bootstrap$Table$maybeWrapResponsive = F2(
 	function (options, table_) {
 		var responsiveClass = $elm$html$Html$Attributes$class(
@@ -7110,6 +7321,16 @@ var $elm$core$String$pad = F3(
 	});
 var $author$project$Show$formatFileName = F4(
 	function (resolution, param, year, bctype) {
+		var varSaveName = function () {
+			switch (param) {
+				case 'O3 (max 8hr avg)':
+					return 'O3_max_8hr_avg';
+				case 'PM2.5':
+					return 'PM25';
+				default:
+					return param;
+			}
+		}();
 		var resSuffix = function () {
 			switch (resolution) {
 				case 'raw':
@@ -7136,7 +7357,7 @@ var $author$project$Show$formatFileName = F4(
 		}();
 		var modelSubnameStr = (bctype.name === 'r_nrmse') ? ('/' + bctype.subname) : '';
 		var nStatsStr = 'n_stats_' + (bctype.n_stats + modelSubnameStr);
-		var fileNameRoot = param + ('_' + ($elm$core$String$fromInt(year) + ('_' + (A3(
+		var fileNameRoot = varSaveName + ('_' + ($elm$core$String$fromInt(year) + ('_' + (A3(
 			$elm$core$String$pad,
 			2,
 			_Utils_chr('0'),
@@ -7145,7 +7366,7 @@ var $author$project$Show$formatFileName = F4(
 			$elm$core$String$join,
 			'/',
 			_List_fromArray(
-				[$author$project$Show$fileBase, resStr, bctype.name, bctype.base, param, nStatsStr, fileNameRoot]));
+				[$author$project$Show$fileBase, resStr, bctype.name, bctype.base, varSaveName, nStatsStr, fileNameRoot]));
 	});
 var $author$project$Show$toTd = F4(
 	function (resolution, param, year, bctype) {
@@ -7213,26 +7434,47 @@ var $author$project$Show$view = function (model) {
 		_List_fromArray(
 			[
 				A2(
-				$elm$html$Html$div,
+				$rundis$elm_bootstrap$Bootstrap$Form$formInline,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('container w-25')
+						$elm$html$Html$Attributes$class('justify-content-center')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Parameter: '),
-						$author$project$Show$paramSelect
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('container w-25')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Resolution: '),
-						$author$project$Show$resSelect
+						A2(
+						$rundis$elm_bootstrap$Bootstrap$Form$group,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$rundis$elm_bootstrap$Bootstrap$Form$label,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$for('paramSelect')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Parameter: ')
+									])),
+								$author$project$Show$paramSelect
+							])),
+						A2(
+						$rundis$elm_bootstrap$Bootstrap$Form$group,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$rundis$elm_bootstrap$Bootstrap$Form$label,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$for('resSelect')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Resolution: ')
+									])),
+								$author$project$Show$resSelect
+							]))
 					])),
 				A2($elm$html$Html$br, _List_Nil, _List_Nil),
 				A2(
