@@ -5417,7 +5417,6 @@ var $elm$core$Dict$get = F2(
 			}
 		}
 	});
-var $elm$core$Debug$log = _Debug_log;
 var $elm$core$List$drop = F2(
 	function (n, list) {
 		drop:
@@ -5611,14 +5610,11 @@ var $author$project$Show$update = F2(
 				var name = msg.a;
 				var subname = (name === 'r_nrmse') ? 'r_70_nrmse_20' : '';
 				var nStats = (A2($elm$core$String$left, 4, name) === 'intp') ? '3' : '1';
-				return A2(
-					$elm$core$Debug$log,
-					name,
-					_Utils_Tuple2(
-						_Utils_update(
-							model,
-							{newNStats: nStats, newName: name, newSubname: subname}),
-						$elm$core$Platform$Cmd$none));
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{newNStats: nStats, newName: name, newSubname: subname}),
+					$elm$core$Platform$Cmd$none);
 			case 'AddSelectSubnameMsg':
 				var subname = msg.a;
 				return _Utils_Tuple2(
@@ -7037,138 +7033,161 @@ var $author$project$Show$DeleteButtonMsg = function (a) {
 var $rundis$elm_bootstrap$Bootstrap$Internal$Button$Danger = {$: 'Danger'};
 var $rundis$elm_bootstrap$Bootstrap$Button$danger = $rundis$elm_bootstrap$Bootstrap$Internal$Button$Coloring(
 	$rundis$elm_bootstrap$Bootstrap$Internal$Button$Roled($rundis$elm_bootstrap$Bootstrap$Internal$Button$Danger));
+var $author$project$Show$matchBCType = F2(
+	function (model1, model2) {
+		return _Utils_eq(model1.name, model2.name) && (_Utils_eq(model1.subname, model2.subname) && (_Utils_eq(model1.n_stats, model2.n_stats) && _Utils_eq(model1.base, model2.base)));
+	});
 var $rundis$elm_bootstrap$Bootstrap$Table$RowAttr = function (a) {
 	return {$: 'RowAttr', a: a};
 };
 var $rundis$elm_bootstrap$Bootstrap$Table$rowAttr = function (attr_) {
 	return $rundis$elm_bootstrap$Bootstrap$Table$RowAttr(attr_);
 };
+var $rundis$elm_bootstrap$Bootstrap$Internal$Role$Light = {$: 'Light'};
+var $rundis$elm_bootstrap$Bootstrap$Table$Roled = function (a) {
+	return {$: 'Roled', a: a};
+};
+var $rundis$elm_bootstrap$Bootstrap$Table$RoledRow = function (a) {
+	return {$: 'RoledRow', a: a};
+};
+var $rundis$elm_bootstrap$Bootstrap$Table$rowLight = $rundis$elm_bootstrap$Bootstrap$Table$RoledRow(
+	$rundis$elm_bootstrap$Bootstrap$Table$Roled($rundis$elm_bootstrap$Bootstrap$Internal$Role$Light));
+var $rundis$elm_bootstrap$Bootstrap$Internal$Role$Warning = {$: 'Warning'};
+var $rundis$elm_bootstrap$Bootstrap$Table$rowWarning = $rundis$elm_bootstrap$Bootstrap$Table$RoledRow(
+	$rundis$elm_bootstrap$Bootstrap$Table$Roled($rundis$elm_bootstrap$Bootstrap$Internal$Role$Warning));
 var $rundis$elm_bootstrap$Bootstrap$Table$td = F2(
 	function (options, children) {
 		return $rundis$elm_bootstrap$Bootstrap$Table$Td(
 			{children: children, options: options});
 	});
-var $author$project$Show$toBCTypesTr = function (bctype) {
-	return A2(
-		$rundis$elm_bootstrap$Bootstrap$Table$tr,
-		_List_fromArray(
-			[
-				$rundis$elm_bootstrap$Bootstrap$Table$rowAttr(
-				$elm$html$Html$Attributes$id(bctype.id))
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$rundis$elm_bootstrap$Bootstrap$Table$td,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text(bctype.name)
-					])),
-				A2(
-				$rundis$elm_bootstrap$Bootstrap$Table$td,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text(bctype.subname)
-					])),
-				A2(
-				$rundis$elm_bootstrap$Bootstrap$Table$td,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text(bctype.base)
-					])),
-				A2(
-				$rundis$elm_bootstrap$Bootstrap$Table$td,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text(bctype.n_stats)
-					])),
-				A2(
-				$rundis$elm_bootstrap$Bootstrap$Table$td,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$rundis$elm_bootstrap$Bootstrap$Button$button,
-						_List_fromArray(
-							[
-								$rundis$elm_bootstrap$Bootstrap$Button$danger,
-								$rundis$elm_bootstrap$Bootstrap$Button$onClick(
-								$author$project$Show$DeleteButtonMsg(bctype.id))
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('delete')
-							]))
-					]))
-			]));
-};
-var $author$project$Show$showBCTypesTable = function (bctypeList) {
-	return $rundis$elm_bootstrap$Bootstrap$Table$table(
-		{
-			options: _List_fromArray(
+var $author$project$Show$toSelectedTableRow = F2(
+	function (bctype, param) {
+		var defaultModel = A2(
+			$elm$core$Maybe$withDefault,
+			$author$project$Show$defaultBCType,
+			A2($elm$core$Dict$get, param, $author$project$Show$defaultModels));
+		var rowClass = A2($author$project$Show$matchBCType, defaultModel, bctype) ? $rundis$elm_bootstrap$Bootstrap$Table$rowWarning : $rundis$elm_bootstrap$Bootstrap$Table$rowLight;
+		return A2(
+			$rundis$elm_bootstrap$Bootstrap$Table$tr,
+			_List_fromArray(
 				[
-					$rundis$elm_bootstrap$Bootstrap$Table$small,
-					$rundis$elm_bootstrap$Bootstrap$Table$hover,
-					$rundis$elm_bootstrap$Bootstrap$Table$attr(
-					$elm$html$Html$Attributes$class('table-fixed'))
+					$rundis$elm_bootstrap$Bootstrap$Table$rowAttr(
+					$elm$html$Html$Attributes$id(bctype.id)),
+					rowClass
 				]),
-			tbody: A2(
-				$rundis$elm_bootstrap$Bootstrap$Table$tbody,
-				_List_Nil,
-				A2($elm$core$List$map, $author$project$Show$toBCTypesTr, bctypeList)),
-			thead: $rundis$elm_bootstrap$Bootstrap$Table$simpleThead(
-				_List_fromArray(
+			_List_fromArray(
+				[
+					A2(
+					$rundis$elm_bootstrap$Bootstrap$Table$td,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(bctype.name)
+						])),
+					A2(
+					$rundis$elm_bootstrap$Bootstrap$Table$td,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(bctype.subname)
+						])),
+					A2(
+					$rundis$elm_bootstrap$Bootstrap$Table$td,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(bctype.base)
+						])),
+					A2(
+					$rundis$elm_bootstrap$Bootstrap$Table$td,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(bctype.n_stats)
+						])),
+					A2(
+					$rundis$elm_bootstrap$Bootstrap$Table$td,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Button$button,
+							_List_fromArray(
+								[
+									$rundis$elm_bootstrap$Bootstrap$Button$danger,
+									$rundis$elm_bootstrap$Bootstrap$Button$onClick(
+									$author$project$Show$DeleteButtonMsg(bctype.id))
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('delete')
+								]))
+						]))
+				]));
+	});
+var $author$project$Show$showBCTypesTable = F2(
+	function (bctypeList, param) {
+		return $rundis$elm_bootstrap$Bootstrap$Table$table(
+			{
+				options: _List_fromArray(
 					[
-						A2(
-						$rundis$elm_bootstrap$Bootstrap$Table$th,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Name')
-							])),
-						A2(
-						$rundis$elm_bootstrap$Bootstrap$Table$th,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Subname')
-							])),
-						A2(
-						$rundis$elm_bootstrap$Bootstrap$Table$th,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('N stations')
-							])),
-						A2(
-						$rundis$elm_bootstrap$Bootstrap$Table$th,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Base year')
-							])),
-						A2(
-						$rundis$elm_bootstrap$Bootstrap$Table$th,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Delete row')
-							]))
-					]))
-		});
-};
-var $elm$html$Html$Attributes$src = function (url) {
-	return A2(
-		$elm$html$Html$Attributes$stringProperty,
-		'src',
-		_VirtualDom_noJavaScriptOrHtmlUri(url));
-};
-var $author$project$Show$toPlotTh = F2(
-	function (bctype, field) {
+						$rundis$elm_bootstrap$Bootstrap$Table$small,
+						$rundis$elm_bootstrap$Bootstrap$Table$hover,
+						$rundis$elm_bootstrap$Bootstrap$Table$attr(
+						$elm$html$Html$Attributes$class('table-fixed'))
+					]),
+				tbody: A2(
+					$rundis$elm_bootstrap$Bootstrap$Table$tbody,
+					_List_Nil,
+					A2(
+						$elm$core$List$map,
+						function (bctype) {
+							return A2($author$project$Show$toSelectedTableRow, bctype, param);
+						},
+						bctypeList)),
+				thead: $rundis$elm_bootstrap$Bootstrap$Table$simpleThead(
+					_List_fromArray(
+						[
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Table$th,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Name')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Table$th,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Subname')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Table$th,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('N stations')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Table$th,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Base year')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Table$th,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Delete row')
+								]))
+						]))
+			});
+	});
+var $author$project$Show$toPlotTh = F3(
+	function (bctype, isDefault, field) {
 		var value = function () {
 			switch (field) {
 				case 'name':
@@ -7183,109 +7202,112 @@ var $author$project$Show$toPlotTh = F2(
 					return bctype.name;
 			}
 		}();
+		var cellClass = isDefault ? 'th_center_default' : 'th_center_other';
 		return A2(
 			$elm$html$Html$th,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('th_center')
+					$elm$html$Html$Attributes$class(cellClass)
 				]),
 			_List_fromArray(
 				[
 					$elm$html$Html$text(value)
 				]));
 	});
-var $author$project$Show$toThead = function (bctypeList) {
-	return A2(
-		$elm$html$Html$thead,
-		_List_Nil,
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				A2(
-					$elm$core$List$cons,
+var $author$project$Show$toPlotsHeaderRows = F3(
+	function (bcTypeList, isDefaultList, field) {
+		return A3(
+			$elm$core$List$map2,
+			F2(
+				function (bctype, isDefault) {
+					return A3($author$project$Show$toPlotTh, bctype, isDefault, field);
+				}),
+			bcTypeList,
+			isDefaultList);
+	});
+var $author$project$Show$toPlotsHeader = F2(
+	function (bcTypeList, param) {
+		var defaultModel = A2(
+			$elm$core$Maybe$withDefault,
+			$author$project$Show$defaultBCType,
+			A2($elm$core$Dict$get, param, $author$project$Show$defaultModels));
+		var isDefaultList = A2(
+			$elm$core$List$map,
+			function (bctype) {
+				return A2($author$project$Show$matchBCType, bctype, defaultModel);
+			},
+			bcTypeList);
+		return A2(
+			$elm$html$Html$thead,
+			_List_Nil,
+			_List_fromArray(
+				[
 					A2(
-						$elm$html$Html$th,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('th_center')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Name')
-							])),
+					$elm$html$Html$tr,
+					_List_Nil,
 					A2(
-						$elm$core$List$map,
-						function (bctype) {
-							return A2($author$project$Show$toPlotTh, bctype, 'name');
-						},
-						bctypeList))),
-				A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				A2(
-					$elm$core$List$cons,
+						$elm$core$List$cons,
+						A2(
+							$elm$html$Html$th,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('th_center')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Name')
+								])),
+						A3($author$project$Show$toPlotsHeaderRows, bcTypeList, isDefaultList, 'name'))),
 					A2(
-						$elm$html$Html$th,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('th_center')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Subname')
-							])),
+					$elm$html$Html$tr,
+					_List_Nil,
 					A2(
-						$elm$core$List$map,
-						function (bctype) {
-							return A2($author$project$Show$toPlotTh, bctype, 'subname');
-						},
-						bctypeList))),
-				A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				A2(
-					$elm$core$List$cons,
+						$elm$core$List$cons,
+						A2(
+							$elm$html$Html$th,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('th_center')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Subname')
+								])),
+						A3($author$project$Show$toPlotsHeaderRows, bcTypeList, isDefaultList, 'subname'))),
 					A2(
-						$elm$html$Html$th,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('th_center')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('N stations')
-							])),
+					$elm$html$Html$tr,
+					_List_Nil,
 					A2(
-						$elm$core$List$map,
-						function (bctype) {
-							return A2($author$project$Show$toPlotTh, bctype, 'n_stats');
-						},
-						bctypeList))),
-				A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				A2(
-					$elm$core$List$cons,
+						$elm$core$List$cons,
+						A2(
+							$elm$html$Html$th,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('th_center')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('N stations')
+								])),
+						A3($author$project$Show$toPlotsHeaderRows, bcTypeList, isDefaultList, 'n_stats'))),
 					A2(
-						$elm$html$Html$th,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('th_center')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Base year')
-							])),
+					$elm$html$Html$tr,
+					_List_Nil,
 					A2(
-						$elm$core$List$map,
-						function (bctype) {
-							return A2($author$project$Show$toPlotTh, bctype, 'base');
-						},
-						bctypeList)))
-			]));
-};
+						$elm$core$List$cons,
+						A2(
+							$elm$html$Html$th,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('th_center')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Base year')
+								])),
+						A3($author$project$Show$toPlotsHeaderRows, bcTypeList, isDefaultList, 'base')))
+				]));
+	});
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
@@ -7368,6 +7390,12 @@ var $author$project$Show$formatFileName = F4(
 			_List_fromArray(
 				[$author$project$Show$fileBase, resStr, bctype.name, bctype.base, varSaveName, nStatsStr, fileNameRoot]));
 	});
+var $elm$html$Html$Attributes$src = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'src',
+		_VirtualDom_noJavaScriptOrHtmlUri(url));
+};
 var $author$project$Show$toTd = F4(
 	function (resolution, param, year, bctype) {
 		var str = A4($author$project$Show$formatFileName, resolution, param, year, bctype);
@@ -7385,7 +7413,7 @@ var $author$project$Show$toTd = F4(
 					_List_Nil)
 				]));
 	});
-var $author$project$Show$toTr = F4(
+var $author$project$Show$toPlotsRow = F4(
 	function (resolution, param, year, bctypeList) {
 		return A2(
 			$elm$html$Html$tr,
@@ -7407,7 +7435,7 @@ var $author$project$Show$toTr = F4(
 					},
 					bctypeList)));
 	});
-var $author$project$Show$toHtmlTable = F4(
+var $author$project$Show$showPlotsTable = F4(
 	function (resolution, param, yearList, bctypeList) {
 		return A2(
 			$elm$html$Html$table,
@@ -7417,11 +7445,11 @@ var $author$project$Show$toHtmlTable = F4(
 				]),
 			A2(
 				$elm$core$List$cons,
-				$author$project$Show$toThead(bctypeList),
+				A2($author$project$Show$toPlotsHeader, bctypeList, param),
 				A2(
 					$elm$core$List$map,
 					function (year) {
-						return A4($author$project$Show$toTr, resolution, param, year, bctypeList);
+						return A4($author$project$Show$toPlotsRow, resolution, param, year, bctypeList);
 					},
 					yearList)));
 	});
@@ -7485,7 +7513,7 @@ var $author$project$Show$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						$author$project$Show$showBCTypesTable(model.bcTypes)
+						A2($author$project$Show$showBCTypesTable, model.bcTypes, model.param)
 					])),
 				A2(
 				$elm$html$Html$div,
@@ -7518,7 +7546,7 @@ var $author$project$Show$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						A4($author$project$Show$toHtmlTable, model.res, model.param, $author$project$Show$years, model.bcTypes)
+						A4($author$project$Show$showPlotsTable, model.res, model.param, $author$project$Show$years, model.bcTypes)
 					]))
 			]));
 };

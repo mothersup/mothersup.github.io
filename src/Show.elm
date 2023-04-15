@@ -121,7 +121,7 @@ type Msg
     | DeleteButtonMsg String
 
 
-{-| Create a string for the file name of the plot specified 
+{-| Create a string for the file name of the plot specified
 by the resolution, parameter, year and BCType
 -}
 formatFileName : String -> String -> Int -> BCType -> String
@@ -207,10 +207,10 @@ toTd resolution param year bctype =
     td [] [ img [ src str ] [] ]
 
 
-{-| Display images in a row in  a table
+{-| Display images in a row in a table
 -}
-toTr : String -> String -> Int -> List BCType -> Html msg
-toTr resolution param year bctypeList =
+toPlotsRow : String -> String -> Int -> List BCType -> Html msg
+toPlotsRow resolution param year bctypeList =
     tr []
         (td [] [ String.fromInt year |> text ]
             :: List.map
@@ -219,8 +219,8 @@ toTr resolution param year bctypeList =
         )
 
 
-toPlotTh : BCType -> String -> Html Msg
-toPlotTh bctype field =
+toPlotTh : BCType -> Bool -> String -> Html Msg
+toPlotTh bctype isDefault field =
     let
         value =
             case field of
@@ -238,45 +238,94 @@ toPlotTh bctype field =
 
                 _ ->
                     bctype.name
+
+        cellClass =
+            if isDefault then
+                "th_center_default"
+
+            else
+                "th_center_other"
     in
-    th [ class "th_center" ] [ text value ]
+    th [ class cellClass ] [ text value ]
 
 
-toThead : List BCType -> Html Msg
-toThead bctypeList =
+toPlotsHeaderRows : List BCType -> List Bool -> String -> List (Html Msg)
+toPlotsHeaderRows bcTypeList isDefaultList field =
+    List.map2
+        (\bctype isDefault -> toPlotTh bctype isDefault field)
+        bcTypeList
+        isDefaultList
+
+
+toPlotsHeader : List BCType -> String -> Html Msg
+toPlotsHeader bcTypeList param =
+    let
+        defaultModel =
+            Dict.get param defaultModels
+                |> Maybe.withDefault defaultBCType
+
+        isDefaultList =
+            List.map (\bctype -> matchBCType bctype defaultModel) bcTypeList
+    in
     thead []
         [ tr []
             (th [ class "th_center" ] [ text "Name" ]
-                :: List.map (\bctype -> toPlotTh bctype "name") bctypeList
+                :: toPlotsHeaderRows bcTypeList isDefaultList "name"
             )
         , tr []
             (th [ class "th_center" ] [ text "Subname" ]
-                :: List.map (\bctype -> toPlotTh bctype "subname") bctypeList
+                :: toPlotsHeaderRows bcTypeList isDefaultList "subname"
             )
         , tr []
             (th [ class "th_center" ] [ text "N stations" ]
-                :: List.map (\bctype -> toPlotTh bctype "n_stats") bctypeList
+                :: toPlotsHeaderRows bcTypeList isDefaultList "n_stats"
             )
         , tr []
             (th [ class "th_center" ] [ text "Base year" ]
-                :: List.map (\bctype -> toPlotTh bctype "base") bctypeList
+                :: toPlotsHeaderRows bcTypeList isDefaultList "base"
             )
         ]
 
 
-toHtmlTable : String -> String -> List Int -> List BCType -> Html Msg
-toHtmlTable resolution param yearList bctypeList =
+matchBCType : BCType -> BCType -> Bool
+matchBCType model1 model2 =
+    (model1.name == model2.name)
+        && (model1.subname == model2.subname)
+        && (model1.n_stats == model2.n_stats)
+        && (model1.base == model2.base)
+
+
+{-| Display all plots of the selected models in a table.
+-}
+showPlotsTable : String -> String -> List Int -> List BCType -> Html Msg
+showPlotsTable resolution param yearList bctypeList =
     table [ class "center" ]
-        (toThead bctypeList
+        (toPlotsHeader bctypeList param
             :: List.map
-                (\year -> toTr resolution param year bctypeList)
+                (\year -> toPlotsRow resolution param year bctypeList)
                 yearList
         )
 
 
-toBCTypesTr : BCType -> Table.Row Msg
-toBCTypesTr bctype =
-    Table.tr [ Table.rowAttr (id bctype.id) ]
+{-| Display the selecetd models in a table,
+with a button to remove the corresponding row.
+Default models are highlighted by a yellow background.
+-}
+toSelectedTableRow : BCType -> String -> Table.Row Msg
+toSelectedTableRow bctype param =
+    let
+        defaultModel =
+            Dict.get param defaultModels
+                |> Maybe.withDefault defaultBCType
+
+        rowClass =
+            if matchBCType defaultModel bctype then
+                Table.rowWarning
+
+            else
+                Table.rowLight
+    in
+    Table.tr [ Table.rowAttr (id bctype.id), rowClass ]
         [ Table.td [] [ text bctype.name ]
         , Table.td [] [ text bctype.subname ]
         , Table.td [] [ text bctype.base ]
@@ -291,8 +340,8 @@ toBCTypesTr bctype =
         ]
 
 
-showBCTypesTable : List BCType -> Html Msg
-showBCTypesTable bctypeList =
+showBCTypesTable : List BCType -> String -> Html Msg
+showBCTypesTable bctypeList param =
     Table.table
         { options = [ Table.small, Table.hover, Table.attr (class "table-fixed") ]
         , thead =
@@ -306,7 +355,10 @@ showBCTypesTable bctypeList =
         , tbody =
             Table.tbody
                 []
-                (List.map toBCTypesTr bctypeList)
+                (List.map
+                    (\bctype -> toSelectedTableRow bctype param)
+                    bctypeList
+                )
         }
 
 
@@ -339,14 +391,13 @@ update msg model =
                     else
                         ""
             in
-            Debug.log name
-                ( { model
-                    | newName = name
-                    , newNStats = nStats
-                    , newSubname = subname
-                  }
-                , Cmd.none
-                )
+            ( { model
+                | newName = name
+                , newNStats = nStats
+                , newSubname = subname
+              }
+            , Cmd.none
+            )
 
         AddSelectSubnameMsg subname ->
             ( { model | newSubname = subname }, Cmd.none )
@@ -449,11 +500,6 @@ listOptionsSelected opt default =
         [ text opt ]
 
 
-
--- paramSelect : Model -> Html Msg
--- paramSelect model =
-
-
 paramSelect : Html Msg
 paramSelect =
     Select.select
@@ -462,11 +508,6 @@ paramSelect =
         , Select.onChange EditParam
         ]
         (List.map listOptions params)
-
-
-
--- resSelect : Model -> Html Msg
--- resSelect model =
 
 
 resSelect : Html Msg
@@ -574,7 +615,7 @@ view model =
         , div
             [ class "plots_table"
             ]
-            [ showBCTypesTable model.bcTypes ]
+            [ showBCTypesTable model.bcTypes model.param ]
         , div []
             [ inputForm model ]
         , br [] []
@@ -582,7 +623,7 @@ view model =
             [ img [ src (fileBase ++ "/conc_cb.png"), class "img-center" ] [] ]
         , br [] []
         , div [ class "center" ]
-            [ toHtmlTable model.res model.param years model.bcTypes ]
+            [ showPlotsTable model.res model.param years model.bcTypes ]
         ]
 
 
